@@ -26,21 +26,21 @@ public class ClassesController {
     public ResponseEntity<DFResponse<Object>> select(@RequestBody Pageable pageable, Authentication authentication){
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(classesService.select(pageable, authentication));
+                .body(new DFResponse<>("OK", "Get data successful", classesService.select(pageable, authentication)));
     }
 
     @PostMapping("/cms/classes")
     public ResponseEntity<DFResponse<Object>> insert(@RequestBody ClassesRequest classesRequest, Authentication authentication){
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(classesService.insert(classesRequest, authentication));
+                .body(new DFResponse<>("OK", "Insert data successful", classesService.insert(classesRequest, authentication)));
     }
 
     @PutMapping("/cms/classes/{id}")
     public ResponseEntity<DFResponse<Object>> update(@RequestBody ClassesRequest classesRequest, @PathVariable("id") int id, Authentication authentication){
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(classesService.update(classesRequest, id, authentication));
+                .body(new DFResponse<>("OK", "Update data successful", classesService.update(classesRequest, id, authentication)));
 
     }
 
@@ -48,6 +48,6 @@ public class ClassesController {
     public ResponseEntity<DFResponse<Object>> delete(@PathVariable("id") int id, Authentication authentication){
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(classesService.delete(id, authentication));
+                .body(new DFResponse<>("OK", "Delete data successful", classesService.delete(id, authentication)));
     }
 }

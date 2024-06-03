@@ -14,6 +14,7 @@ public abstract class PeopleMap extends BaseMapper<PeopleRequest, PeopleResponse
 
     public UserDTO toUserDTO(Optional<People> people){
         UserDTO userDTO = new UserDTO();
+        userDTO.setId(people.get().getId());
         userDTO.setData(people.get());
         return userDTO;
     }
