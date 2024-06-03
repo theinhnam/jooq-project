@@ -85,10 +85,10 @@ public abstract class AbsBaseRepository<Po, Id, R extends TableRecordImpl<R>> im
 
     @Override
     public Optional<Po> findById(Id id) {
-        return (Optional<Po>) dslContext.selectFrom(getTable())
+        return dslContext.selectFrom(getTable())
                 .where(fieldId.eq(id))
                 .limit(1)
-                .fetchOneInto(pojoClass);
+                .fetchOptionalInto(pojoClass);
 
     }
 }

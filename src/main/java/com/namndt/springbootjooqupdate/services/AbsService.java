@@ -1,6 +1,8 @@
 package com.namndt.springbootjooqupdate.services;
 
 import com.namndt.springbootjooq.model.tables.pojos.Classes;
+import com.namndt.springbootjooqupdate.data.exception.AccessDeniedException;
+import com.namndt.springbootjooqupdate.data.exception.NotFoundException;
 import com.namndt.springbootjooqupdate.data.mappers.BaseMapper;
 import com.namndt.springbootjooqupdate.data.models.Pageable;
 import com.namndt.springbootjooqupdate.data.responses.DFResponse;
@@ -8,6 +10,7 @@ import com.namndt.springbootjooqupdate.repositories.AbsBaseRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class AbsService<Rq, Rp, Po, Id, Repo extends AbsBaseRepository<Po, Id, ?>, Map extends BaseMapper<Rq, Rp, Po>>
         implements BaseService<Rq, Rp, Po, Id>{
@@ -15,11 +18,11 @@ public abstract class AbsService<Rq, Rp, Po, Id, Repo extends AbsBaseRepository<
 
     protected Map mapper;
 
-    public DFResponse<Object> select(Pageable pageable, Authentication authentication){
+    public List<Rp> select(Pageable pageable, Authentication authentication){
         if (!checkPermissionAdmin(authentication)){
-            return new DFResponse<>("OK", "You don't have permission to access !", null);
+            throw new AccessDeniedException();
         }
-        return new DFResponse<>("OK", "Get data successful", mapper.toResponses(repository.select(pageable)));
+        return mapper.toResponses(repository.select(pageable));
     }
 
     private boolean checkPermissionAdmin(Authentication authentication) {
@@ -27,6 +30,7 @@ public abstract class AbsService<Rq, Rp, Po, Id, Repo extends AbsBaseRepository<
 
         for (GrantedAuthority grantedAuthority: grantedAuthorities) {
             if ("ROLE_ADMIN".equals(grantedAuthority.getAuthority())){
+                System.out.println("true");
                 return true;
             }
         }
@@ -34,34 +38,33 @@ public abstract class AbsService<Rq, Rp, Po, Id, Repo extends AbsBaseRepository<
     }
 
     @Override
-    public DFResponse<Object> insert(Rq data, Authentication authentication) {
+    public Rp insert(Rq data, Authentication authentication) {
         if (!checkPermissionAdmin(authentication)){
-            return new DFResponse<>("OK", "You don't have permission to access !", null);
+            throw new AccessDeniedException();
         }
-        return new DFResponse<>("OK", "Create successful", mapper.toResponse(repository.insertReturning(mapper.toPojo(data))));
+        return mapper.toResponse(repository.insertReturning(mapper.toPojo(data)));
     }
 
     @Override
-    public DFResponse<Object> update(Rq data, Id id, Authentication authentication) {
+    public int update(Rq data, Id id, Authentication authentication) {
         if (!checkPermissionAdmin(authentication)){
-            return new DFResponse<>("OK", "You don't have permission to access !", null);
+            throw new AccessDeniedException();
         }
-        repository.update(mapper.toPojo(data), id);
-        return new DFResponse<>("OK", "Update succesful", mapper.toResponse(repository.findById(id).get()));
+        return repository.update(mapper.toPojo(data), id);
     }
 
     @Override
-    public DFResponse<Object> delete(Id id, Authentication authentication) {
+    public int delete(Id id, Authentication authentication) {
         if (!checkPermissionAdmin(authentication)){
-            return new DFResponse<>("OK", "You don't have permission to access !", null);
+            throw new AccessDeniedException();
         }
 
-        Classes classesDelete = (Classes) repository.findById(id).orElse(null);
+        Optional<Po> pojo = repository.findById(id);
 
-        if (classesDelete == null) {
-            return new DFResponse<>("OK", "Classes not found", null);
+        if (!pojo.isPresent()) {
+            throw new NotFoundException();
         }
 
-        return new DFResponse<>("OK", "Delete succesful", null);
+        return repository.deleteById(id);
     }
 }
