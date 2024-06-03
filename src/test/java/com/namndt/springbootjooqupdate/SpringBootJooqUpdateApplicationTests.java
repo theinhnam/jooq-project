@@ -10,4 +10,5 @@ class SpringBootJooqUpdateApplicationTests {
     void contextLoads() {
     }
 
+
 }

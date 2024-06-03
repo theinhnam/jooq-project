@@ -25,6 +25,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -49,9 +50,12 @@ public class JwtFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(token) && jwtUtils.validateToken(token)){
             String user = jwtUtils.getUsernameFromToken(token);
 
-            UserDTO userDetails = peopleMap.toUserDTO(peopleRepository.getPeopleByUser(user));
+            Optional<People> people = peopleRepository.getPeopleByUser(user);
 
-            if (userDetails != null){
+            if (people.isPresent()){
+
+                UserDTO userDetails = peopleMap.toUserDTO(people);
+
                 userDetails.setRoles(roleRepository.getRoleNameByUserId(userDetails.getId()));
 
                 Authentication auth = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null, getGrantedAuthorities(userDetails.getRoles()));

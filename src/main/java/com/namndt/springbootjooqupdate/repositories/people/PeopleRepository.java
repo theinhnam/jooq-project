@@ -8,6 +8,8 @@ import com.namndt.springbootjooqupdate.repositories.AbsBaseRepository;
 import org.jooq.impl.TableImpl;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public class PeopleRepository extends AbsBaseRepository<People, Integer, PeopleRecord> implements IPeopleRepository{
     @Override
@@ -16,10 +18,10 @@ public class PeopleRepository extends AbsBaseRepository<People, Integer, PeopleR
     }
 
     @Override
-    public People getPeopleByUser(String username) {
+    public Optional<People> getPeopleByUser(String username) {
         return dslContext.selectFrom(getTable())
                 .where(PEOPLE.USERNAME.eq(username))
-                .fetchOne()
-                .into(People.class);
+                .fetchOptionalInto(People.class);
     }
+
 }

@@ -7,9 +7,15 @@ import com.namndt.springbootjooqupdate.data.requests.PeopleRequest;
 import com.namndt.springbootjooqupdate.data.responses.PeopleResponse;
 import org.mapstruct.Mapper;
 
+import java.util.Optional;
+
 @Mapper(componentModel = "spring")
 public abstract class PeopleMap extends BaseMapper<PeopleRequest, PeopleResponse, People> {
 
-    public abstract UserDTO toUserDTO(People people);
+    public UserDTO toUserDTO(Optional<People> people){
+        UserDTO userDTO = new UserDTO();
+        userDTO.setData(people.get());
+        return userDTO;
+    }
 
 }
